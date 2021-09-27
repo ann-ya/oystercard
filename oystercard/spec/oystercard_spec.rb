@@ -5,7 +5,7 @@ describe Oystercard do
 
   describe '#initialize' do
     
-    it "gives a new oystercardwith a balance" do
+    it "gives a new oystercardwith a balance of 0" do
       expect(subject.balance).to eq 0
     end
 
@@ -35,31 +35,44 @@ describe Oystercard do
     subject.top_up(10)
     expect { subject.deduct 1 }.to change { subject.balance }.by -1
     end
+
   end
 
   describe '#in_journey?' do
     it { is_expected.to respond_to(:in_journey?) }
   end
 
-  describe '#touch_in' do
-    it { is_expected.to respond_to(:touch_in) }
-  
-    it 'causes card to be in use' do
-      subject.touch_in
-      expect(subject).to be_in_journey
+  describe 'touching in and out' do
+    before(:each) do
+      subject.top_up(card_limit)
     end
+
+    describe '#touch_in' do
+      it { is_expected.to respond_to(:touch_in) }
     
-  end
+      it 'causes card to be in use' do
+        subject.touch_in
+        expect(subject).to be_in_journey
+      end
 
-  describe '#touch_out' do
-    it { is_expected.to respond_to(:touch_out) }
+      it 'not work if balance below minimum amount' do
+        subject.deduct(card_limit)
+        expect { subject.touch_in }.to raise_error "Not enough credit for journey"
+      end
+      
+    end
 
-    it 'causes card to not be in use' do
-      subject.touch_in
-      subject.touch_out
-      expect(subject).not_to be_in_journey
+    describe '#touch_out' do
+      it { is_expected.to respond_to(:touch_out) }
+
+      it 'causes card to be not in use' do
+        subject.touch_in
+        subject.touch_out
+        expect(subject).not_to be_in_journey
+      end
+
     end
 
   end
-
+    
 end
