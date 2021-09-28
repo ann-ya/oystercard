@@ -2,6 +2,7 @@ require 'oystercard'
 
 describe Oystercard do
   let(:card_limit) { Oystercard::CARD_LIMIT }
+  let(:min_charge) { Oystercard::MIN_CHARGE }
 
   describe '#initialize' do
     
@@ -28,15 +29,17 @@ describe Oystercard do
     end
   end
 
-  describe "#deduct" do
-    it { is_expected. to respond_to(:deduct).with(1).argument }
+  # allow_any_instance_of(Oystercard).to receive (:deduct) do
+  
+  # describe "#deduct" do
+  #   it { is_expected. to respond_to(:deduct).with(1).argument }
     
-    it 'will deduct money from card' do
-    subject.top_up(10)
-    expect { subject.deduct 1 }.to change { subject.balance }.by -1
-    end
+  #   it 'will deduct money from card' do
+  #   subject.top_up(10)
+  #   expect { subject.deduct 1 }.to change { subject.balance }.by -1
+  #   end
 
-  end
+  # end
 
   describe '#in_journey?' do
     it { is_expected.to respond_to(:in_journey?) }
@@ -56,7 +59,7 @@ describe Oystercard do
       end
 
       it 'not work if balance below minimum amount' do
-        subject.deduct(card_limit)
+        subject.send(:deduct, card_limit)
         expect { subject.touch_in }.to raise_error "Not enough credit for journey"
       end
       
@@ -70,6 +73,11 @@ describe Oystercard do
         subject.touch_out
         expect(subject).not_to be_in_journey
       end
+
+    it "check if charge is made" do
+      subject.touch_in
+      expect { subject.touch_out }.to change { subject.balance }.by (-min_charge)
+    end
 
     end
 

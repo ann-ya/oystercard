@@ -4,6 +4,7 @@ class Oystercard
 
   CARD_LIMIT = 90
   MIN_AMOUNT = 1
+  MIN_CHARGE = 1
 
   def initialize
     @balance = 0
@@ -13,10 +14,6 @@ class Oystercard
   def top_up(amount)
     fail "Cannot exceed limit of £#{CARD_LIMIT}" if (balance + amount) > CARD_LIMIT
     @balance += amount
-  end
-
-  def deduct(amount)
-    @balance -= amount
   end
 
   def in_journey?
@@ -29,7 +26,13 @@ class Oystercard
   end
 
   def touch_out
+    deduct MIN_CHARGE
     @in_use = false
   end
   
+  private
+  def deduct(amount)
+    @balance -= amount
+  end
+
 end
