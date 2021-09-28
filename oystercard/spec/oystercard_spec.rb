@@ -3,6 +3,7 @@ require 'oystercard'
 describe Oystercard do
   let(:card_limit) { Oystercard::CARD_LIMIT }
   let(:min_charge) { Oystercard::MIN_CHARGE }
+  let(:entry_station){ double :entry_station }
 
   describe '#initialize' do
     
@@ -27,6 +28,7 @@ describe Oystercard do
       subject.top_up(card_limit)
       expect { subject.top_up(1) }.to raise_error "Cannot exceed limit of £#{card_limit}"
     end
+
   end
 
   # allow_any_instance_of(Oystercard).to receive (:deduct) do
@@ -52,32 +54,37 @@ describe Oystercard do
 
     describe '#touch_in' do
       it { is_expected.to respond_to(:touch_in) }
-    
+      
       it 'causes card to be in use' do
-        subject.touch_in
+        subject.touch_in(entry_station)
         expect(subject).to be_in_journey
       end
 
       it 'not work if balance below minimum amount' do
         subject.send(:deduct, card_limit)
-        expect { subject.touch_in }.to raise_error "Not enough credit for journey"
+        expect { subject.touch_in(entry_station) }.to raise_error "Not enough credit for journey"
       end
-      
+        
+      it 'remembers the entry station' do
+        subject.touch_in(entry_station)
+        expect(subject.entry_station).to eq entry_station
+      end
+
     end
 
     describe '#touch_out' do
       it { is_expected.to respond_to(:touch_out) }
 
       it 'causes card to be not in use' do
-        subject.touch_in
+        subject.touch_in(entry_station)
         subject.touch_out
         expect(subject).not_to be_in_journey
       end
 
-    it "check if charge is made" do
-      subject.touch_in
-      expect { subject.touch_out }.to change { subject.balance }.by (-min_charge)
-    end
+      it "charge is made" do
+        subject.touch_in(entry_station)
+        expect { subject.touch_out }.to change { subject.balance }.by (-min_charge)
+      end
 
     end
 
