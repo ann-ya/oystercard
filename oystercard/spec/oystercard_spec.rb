@@ -5,6 +5,7 @@ describe Oystercard do
   let(:min_charge) { Oystercard::MIN_CHARGE }
   let(:entry_station) { double :entry_station }
   let(:exit_station) { double :exit_station }
+  let(:journey) { {entry: entry_station, exit: exit_station} }
 
   describe '#initialize' do
     
@@ -93,6 +94,17 @@ describe Oystercard do
         expect(subject.exit_station).to eq exit_station
       end
 
+    end
+
+    it "store an empty list of journeys" do
+      expect(subject.journeys).to eq []
+    end
+
+    it "stores a journey" do
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      subject.trip_history
+      expect(subject.journeys).to include journey
     end
 
   end
