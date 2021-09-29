@@ -1,6 +1,6 @@
 class Oystercard
 
-  attr_reader :balance, :in_use, :entry_station
+  attr_reader :balance, :in_use, :entry_station, :exit_station
 
   CARD_LIMIT = 90
   MIN_AMOUNT = 1
@@ -27,9 +27,10 @@ class Oystercard
     @entry_station = entry_station
   end
 
-  def touch_out
+  def touch_out(exit_station)
     deduct MIN_CHARGE
     @in_use = false
+    @exit_station = exit_station
   end
   
   private

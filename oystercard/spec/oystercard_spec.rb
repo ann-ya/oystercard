@@ -3,7 +3,8 @@ require 'oystercard'
 describe Oystercard do
   let(:card_limit) { Oystercard::CARD_LIMIT }
   let(:min_charge) { Oystercard::MIN_CHARGE }
-  let(:entry_station){ double :entry_station }
+  let(:entry_station) { double :entry_station }
+  let(:exit_station) { double :exit_station }
 
   describe '#initialize' do
     
@@ -77,13 +78,19 @@ describe Oystercard do
 
       it 'causes card to be not in use' do
         subject.touch_in(entry_station)
-        subject.touch_out
+        subject.touch_out(exit_station)
         expect(subject).not_to be_in_journey
       end
 
       it "charge is made" do
         subject.touch_in(entry_station)
-        expect { subject.touch_out }.to change { subject.balance }.by (-min_charge)
+        expect { subject.touch_out(exit_station) }.to change { subject.balance }.by (-min_charge)
+      end
+
+      it "knows exit station" do
+        subject.touch_in(entry_station)
+        subject.touch_out(exit_station)
+        expect(subject.exit_station).to eq exit_station
       end
 
     end
