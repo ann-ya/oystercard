@@ -13,8 +13,8 @@ describe Journey do
       expect(subject.complete?).to eq true
     end
 
-    it "penalty fare by default" do
-      expect(subject.fare).to eq 6
+    it "correct fare by default" do
+      expect(subject.fare).to eq 1
     end
 
     it "finish a journey" do
